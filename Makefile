@@ -1,4 +1,4 @@
-# vbd - branchable, lazy-fetching, time-travel block device built on the kernel XArray
+# libxarray - the Linux kernel XArray as a userspace library
 
 CC      ?= gcc
 CFLAGS  ?= -O2 -g -Wall

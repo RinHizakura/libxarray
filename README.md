@@ -1,12 +1,13 @@
-# vbd
+# libxarray
 
-A userspace block-device engine built on the Linux kernel's **XArray**. One
-`chunk -> location` lookup path serves three features:
+The Linux kernel's **XArray** as a userspace C library: a radix tree that
+presents itself as a sparse, auto-growing array indexed by `unsigned long`.
+RCU readers take no lock, writers take one spinlock per array, every slot
+carries three mark bits, and `xa_alloc()` hands out unused indices.
 
-1. **Branches**: fork a whole disk in O(1), no data copied
-2. **Lazy fetch**: the base image lives remotely; chunks are fetched on first read
-3. **Time travel**: every write keeps the old version; mount a read-only view
-   of any instant
+`lib/linux/xarray.c` is the kernel source, unmodified. Everything it needs
+from the rest of the kernel is supplied by a small set of hand-written
+headers under `shim/`.
 
 ## Build
 
@@ -18,7 +19,7 @@ make test   # build and run tests/xarray_smoke
 make clean
 ```
 
-## Using the XArray
+## Usage
 
 Compile with `-Iinclude -Ishim -Ilib -D_LGPL_SOURCE`, link with
 `build/libxarray.a -lurcu -lpthread`.
@@ -49,7 +50,7 @@ the kernel default of 6 (64 slots per node).
 ## Layout
 
 ```
-include/xarray.h         public header: the kernel XArray API
+include/xarray.h         public header
 shim/linux/*.h           replacements for the kernel headers lib/linux/ includes;
                          each provides only what xarray uses
 shim/kshim.c             xa_node slab cache on malloc + RCU free callback
